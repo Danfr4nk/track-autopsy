@@ -54,6 +54,42 @@ function embedUrl(t){
   const id = trackId(t.uri);
   return id ? "https://open.spotify.com/embed/track/"+id+"?utm_source=generator&theme=0" : null;
 }
+function bpmRoom(tempo){
+  if(tempo==null) return null;
+  if(tempo>=165) return "165+ dnb room";
+  if(tempo>=125) return "125–145 house room";
+  if(tempo<100) return "sub-100 halftime";
+  return Math.round(tempo)+" bpm";
+}
+function machineChips(m){
+  if(!m) return "";
+  const c = [];
+  if(m.tempo!=null) c.push(`<span class="mchip">♩ ${bpmRoom(m.tempo)}</span>`);
+  if(m.energy!=null) c.push(`<span class="mchip">⚡ energy ${m.energy.toFixed(2)}</span>`);
+  if(m.valence!=null) c.push(`<span class="mchip">◉ valence ${m.valence.toFixed(2)}</span>`);
+  if(m.danceability!=null) c.push(`<span class="mchip">✦ dance ${m.danceability.toFixed(2)}</span>`);
+  if(m.speechiness!=null) c.push(`<span class="mchip">◍ voice ${m.speechiness.toFixed(2)}</span>`);
+  return c.join("");
+}
+function fetchMachine(t){
+  if(t.machine || t.machineTried) return;
+  const id = trackId(t.uri);
+  t.machineTried = true;
+  if(!id) return;
+  fetch("https://api.reccobeats.com/v1/track?ids="+id)
+    .then(r=>r.json())
+    .then(j=>{
+      const hit = (j.content||[]).find(x=>String(x.href||"").includes(id));
+      if(hit){
+        t.machine = { energy:hit.energy, valence:hit.valence, danceability:hit.danceability,
+                      tempo:hit.tempo, speechiness:hit.speechiness, loudness:hit.loudness };
+        save();
+        const el = document.querySelector("#view-play .machineread");
+        if(el) el.innerHTML = machineChips(t.machine) || `<span class="hint">no machine read</span>`;
+      }
+    })
+    .catch(()=>{});
+}
 
 /* ---------- queue ---------- */
 function queue(){ return state.tracks.filter(t=>!t.done); }
@@ -83,6 +119,8 @@ function renderPlay(){
     <div class="t">${esc(t.name||"untitled")}</div>
     <div class="a">${esc(t.artists||"")} · ${done+1} of ${state.tracks.length} dissected</div>
     <div class="player-wrap"><button class="loadplayer" id="loadplayer">▶ load Spotify player</button></div>
+    <div class="q">MACHINE READ <span style="color:var(--faint);letter-spacing:0;text-transform:none">— what the algorithm hears</span></div>
+    <div class="machineread">${t.machine ? machineChips(t.machine) : (t.machineTried ? `<span class="hint">no machine read for this track</span>` : `<span class="hint">reading…</span>`)}</div>
     <div class="q">TRIAGE</div>
     <div class="triage">
       <button class="sbtn ${t.status==="skip"?"on-skip":""}" data-tri="skip">skip</button>
@@ -100,7 +138,7 @@ function renderPlay(){
     <div class="chipgrid" id="killgrid">${chipGrid(t,"kill")}</div>
     <button class="nextbtn" id="nextbtn" ${t.status==="unscored"?"disabled":""}>next track →</button>
     <button class="skipbtn" id="laterbtn">do this one later</button>
-    <div class="hint">Vocals count as texture, never as words. Tag what your ears actually grabbed.</div>
+    <div class="hint">The machine read the measurable stuff above — your taps are for what only ears can judge. Vocals count as texture, never as words.</div>
   </div>`;
   $("view-play").innerHTML = h;
 
@@ -136,6 +174,7 @@ function renderPlay(){
     state.tracks.push(state.tracks.splice(i,1)[0]);
     save(); renderPlay();
   };
+  fetchMachine(t);
 }
 function refreshChips(t){
   $("attrgrid").innerHTML = chipGrid(t,"attrs");

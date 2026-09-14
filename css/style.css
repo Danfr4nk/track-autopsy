@@ -46,6 +46,8 @@ input[type=range]{flex:1;accent-color:var(--blood);height:28px;cursor:pointer}
 .nextbtn:disabled{opacity:.35}
 .skipbtn{width:100%;margin-top:8px;background:transparent;border:1px solid var(--line);color:var(--faint);padding:10px;border-radius:12px;cursor:pointer;font-size:13px}
 .hint{color:var(--faint);font-size:12px;margin-top:8px;line-height:1.5}
+.machineread{display:flex;flex-wrap:wrap;gap:6px}
+.mchip{font-family:var(--mono);font-size:11px;background:var(--panel2);border:1px solid var(--line);color:var(--dim);padding:5px 10px;border-radius:14px}
 
 /* drivers view */
 .dtable{width:100%;border-collapse:collapse;font-size:13px}
