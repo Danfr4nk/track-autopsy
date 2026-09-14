@@ -21,7 +21,10 @@ Paste a **MusicTrainer week export** and every track arrives with its status + s
 
 ## Method notes
 
-- Check-all-that-apply (CATA) beats Likert scales for rapid profiling — tap what grabbed you, skip the rest.
+- Check-all-that-apply (CATA) beats Likert scales for rapid profiling — tap what grabbed you, skip the rest. Validated in sensory science (untrained raters ≈ trained panels, RV > 0.89).
+- The attribute list is anchored on the MUSIC model's three validated dimensions (arousal / valence / depth; Greenberg et al. 2016) with producer-specific items bolted on: drop payoff, bass weight, sound-design novelty, set utility.
+- **Machine/human split**: ReccoBeats auto-fills the measurable (tempo room, energy, valence, danceability, vocal-texture density). Your taps are reserved for what machines can't hear: drop *quality*, bass *weight* vs loudness, arrangement cleverness, mix utility.
+- The KILL ONE round is an ablation/MaxDiff hybrid — no published music-specific version exists; asking what kills a track is more diagnostic than asking what saves it.
 - Vocals are texture, never words (lyric qualifier).
 - Static site, no backend, no Spotify API. `localStorage` key `autopsy.v1`.
 - Live at https://danfr4nk.github.io/track-autopsy/
